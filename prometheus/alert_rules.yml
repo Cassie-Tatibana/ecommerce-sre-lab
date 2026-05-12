@@ -1,0 +1,29 @@
+groups:
+  - name: ecommerce-sre-lab
+    rules:
+      - alert: HighOrderLatency
+        expr: histogram_quantile(0.95, sum by (le) (rate(ecommerce_order_processing_seconds_bucket[5m]))) > 30
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Order processing latency p95 is above 30 seconds.
+          description: Investigate simulator throughput and exporter health.
+
+      - alert: LowInventoryWarning
+        expr: min(ecommerce_inventory_level) < 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: At least one SKU is running low on stock.
+          description: Review recent stockout events and consider a simulated restock.
+
+      - alert: FulfillmentOutage
+        expr: increase(ecommerce_fulfillment_failed_total[5m]) / clamp_min(increase(ecommerce_orders_total{status=~"completed|failed"}[5m]), 1) > 0.5
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Fulfillment failure rate is above 50 percent.
+          description: Validate downstream fulfillment outage and run the incident playbook.
