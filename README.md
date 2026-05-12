@@ -46,8 +46,8 @@ docker compose up --build
 Services:
 - Exporter: [http://localhost:8000/metrics](http://localhost:8000/metrics)
 - Prometheus: [http://localhost:9090](http://localhost:9090)
-- Grafana: [http://localhost:3000](http://localhost:3000) (`admin` / `ecommerce-admin`)
-- Dashboard: [http://localhost:3000/d/ecommerce-overview](http://localhost:3000/d/ecommerce-overview)
+- Grafana admin: [http://localhost:3000](http://localhost:3000) (`admin` / `ecommerce-admin`)
+- Dashboard: [http://localhost:3000/d/ecommerce-overview](http://localhost:3000/d/ecommerce-overview) (anonymous viewer access enabled)
 - State snapshot: [http://localhost:8000/state](http://localhost:8000/state)
 
 Chaos endpoints:
@@ -111,7 +111,7 @@ curl -X POST http://localhost:8000/chaos/reset_traffic
 ## CI And Smoke Tests
 
 - GitHub Actions runs Python unit tests and `docker compose build` on every push and pull request.
-- A dedicated smoke job boots the full stack and uses Playwright to verify Grafana is reachable and the provisioned dashboard loads after login.
+- A dedicated smoke job boots the full stack and uses Playwright to verify Grafana is reachable and the provisioned dashboard loads.
 - Failures can be investigated through compose logs and linked runbooks.
 
 ## Testing

@@ -47,8 +47,8 @@ docker compose up --build
 
 - Exporter 指标：`http://localhost:8000/metrics`
 - Prometheus：`http://localhost:9090`
-- Grafana：`http://localhost:3000`（`admin` / `ecommerce-admin`）
-- Dashboard：`http://localhost:3000/d/ecommerce-overview`
+- Grafana 管理入口：`http://localhost:3000`（`admin` / `ecommerce-admin`）
+- Dashboard：`http://localhost:3000/d/ecommerce-overview`（已开启匿名只读访问）
 - 状态快照：`http://localhost:8000/state`
 
 ## Chaos 接口
