@@ -1,13 +1,16 @@
 # ecommerce-sre-lab
 
-An interview-ready observability lab for a simulated e-commerce supply chain. The project demonstrates metrics design, alerting, incident response, dashboarding, chaos drills, CI, and smoke testing in a compact SRE portfolio repository.
+A self-contained SRE observability system for a simulated e-commerce supply chain. It combines metrics, dashboards, alerting, runbooks, chaos drills, CI, and smoke testing into a runnable platform for operations practice and service reliability experiments.
+
+[![CI](https://github.com/Cassie-Tatibana/ecommerce-sre-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/Cassie-Tatibana/ecommerce-sre-lab/actions/workflows/ci.yml)
+[\u4e2d\u6587 README](README.zh-CN.md)
 
 ## Why This Project
 
-- Shows end-to-end SRE ownership across instrumentation, alerting, runbooks, testing, and containerized delivery.
-- Uses simulated order, inventory, and fulfillment workflows so the platform is easy to run locally without third-party dependencies.
-- Maps directly to common Australia and New Zealand SRE keywords: Prometheus, Grafana, alerting, runbooks, SLO/SLI, CI/CD, incident response.
-- Avoids trademark ambiguity by presenting the system as a Shopify-like e-commerce workflow rather than an affiliated Shopify integration.
+- Provides a runnable reliability playground for order flow, inventory health, and fulfillment operations.
+- Bundles Prometheus, Grafana, alerting, runbooks, and chaos controls into one local stack.
+- Uses simulated events and in-memory state so the system is easy to operate without external APIs or databases.
+- Supports incident drills such as stockouts, traffic spikes, and fulfillment outages with observable recovery paths.
 
 ## Architecture
 
