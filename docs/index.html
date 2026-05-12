@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ecommerce-sre-lab Demo</title>
+    <style>
+      :root {
+        --bg: #07111f;
+        --bg-soft: rgba(15, 28, 48, 0.86);
+        --panel: rgba(10, 20, 36, 0.78);
+        --panel-strong: rgba(17, 31, 52, 0.94);
+        --line: rgba(139, 176, 255, 0.18);
+        --text: #e7eefc;
+        --muted: #9fb0cf;
+        --accent: #76d6ff;
+        --accent-2: #9cffb0;
+        --accent-3: #ffd26f;
+        --danger: #ff7f96;
+        --shadow: 0 24px 80px rgba(2, 9, 20, 0.45);
+        --radius: 24px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(118, 214, 255, 0.18), transparent 28%),
+          radial-gradient(circle at top right, rgba(156, 255, 176, 0.14), transparent 24%),
+          linear-gradient(180deg, #07111f 0%, #0a1628 54%, #08111b 100%);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(120, 154, 205, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(120, 154, 205, 0.05) 1px, transparent 1px);
+        background-size: 32px 32px;
+        mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.9));
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .page {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 24px 0 72px;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 16px;
+        z-index: 20;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+        padding: 14px 18px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(7, 17, 31, 0.7);
+        backdrop-filter: blur(18px);
+        box-shadow: var(--shadow);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-size: 0.82rem;
+      }
+
+      .brand-mark {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        box-shadow: 0 0 20px rgba(118, 214, 255, 0.8);
+      }
+
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .nav a,
+      .button {
+        padding: 10px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(139, 176, 255, 0.12);
+        color: var(--muted);
+        transition: 0.2s ease;
+      }
+
+      .nav a:hover,
+      .button:hover {
+        color: var(--text);
+        border-color: rgba(118, 214, 255, 0.34);
+        background: rgba(118, 214, 255, 0.08);
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 44px;
+        border-radius: calc(var(--radius) + 8px);
+        border: 1px solid rgba(139, 176, 255, 0.18);
+        background:
+          linear-gradient(135deg, rgba(17, 31, 52, 0.94), rgba(10, 20, 36, 0.85)),
+          radial-gradient(circle at top right, rgba(118, 214, 255, 0.22), transparent 30%);
+        box-shadow: var(--shadow);
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto -10% -25% auto;
+        width: 420px;
+        height: 420px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(118, 214, 255, 0.24), transparent 60%);
+        filter: blur(18px);
+      }
+
+      .eyebrow,
+      .section-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(118, 214, 255, 0.24);
+        color: var(--accent);
+        background: rgba(118, 214, 255, 0.08);
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+        letter-spacing: 0.02em;
+      }
+
+      h1 {
+        margin-top: 18px;
+        font-size: clamp(2.8rem, 5vw, 4.6rem);
+        line-height: 0.96;
+      }
+
+      .hero p {
+        max-width: 720px;
+        margin: 18px 0 28px;
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1.7;
+      }
+
+      .hero-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 22px;
+      }
+
+      .hero-actions,
+      .mini-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .button.primary {
+        color: #05111f;
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--accent), #dff8ff);
+      }
+
+      .button.secondary {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .status-column {
+        display: grid;
+        gap: 14px;
+      }
+
+      .status-card,
+      .panel,
+      .surface-card,
+      .step-card,
+      .window {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .status-card {
+        padding: 18px;
+      }
+
+      .status-label {
+        color: var(--muted);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .status-value {
+        margin-top: 8px;
+        font-size: 1.6rem;
+      }
+
+      .status-value.ok {
+        color: var(--accent-2);
+      }
+
+      .status-value.warn {
+        color: var(--accent-3);
+      }
+
+      .section {
+        margin-top: 28px;
+        padding: 30px;
+        border-radius: calc(var(--radius) + 2px);
+        border: 1px solid rgba(139, 176, 255, 0.14);
+        background: var(--bg-soft);
+        box-shadow: var(--shadow);
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: end;
+        margin-bottom: 22px;
+      }
+
+      .section-head p {
+        max-width: 700px;
+        margin: 12px 0 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .surface-grid,
+      .preview-grid,
+      .walkthrough-grid,
+      .readme-grid {
+        display: grid;
+        gap: 18px;
+      }
+
+      .surface-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .surface-card {
+        padding: 18px;
+      }
+
+      .surface-card h3 {
+        font-size: 1rem;
+      }
+
+      .surface-card p {
+        margin: 12px 0 14px;
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .surface-card code,
+      .command,
+      .url-pill,
+      .terminal code {
+        font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+      }
+
+      .url-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        font-size: 0.86rem;
+        word-break: break-all;
+      }
+
+      .architecture {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        align-items: stretch;
+      }
+
+      .panel {
+        padding: 18px;
+        position: relative;
+      }
+
+      .panel::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: -9px;
+        width: 18px;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(118, 214, 255, 0.55), transparent);
+      }
+
+      .panel:last-child::after {
+        display: none;
+      }
+
+      .panel p {
+        margin: 10px 0 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .preview-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .window {
+        overflow: hidden;
+      }
+
+      .window-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .dots {
+        display: inline-flex;
+        gap: 7px;
+      }
+
+      .dots span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .dots span:nth-child(1) {
+        background: #ff7b87;
+      }
+
+      .dots span:nth-child(2) {
+        background: #ffd36d;
+      }
+
+      .dots span:nth-child(3) {
+        background: #91f3b1;
+      }
+
+      .window-title {
+        color: var(--muted);
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .window-body {
+        padding: 18px;
+      }
+
+      .window-body.tight {
+        padding: 0;
+      }
+
+      .dashboard-shell {
+        background:
+          linear-gradient(180deg, rgba(17, 28, 48, 0.98), rgba(8, 16, 28, 0.98));
+      }
+
+      .dashboard-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 18px;
+        border-bottom: 1px solid rgba(139, 176, 255, 0.12);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .toolbar-title strong {
+        display: block;
+        font-size: 1rem;
+      }
+
+      .toolbar-title span {
+        color: var(--muted);
+        font-size: 0.83rem;
+      }
+
+      .toolbar-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .toolbar-pill {
+        padding: 7px 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(139, 176, 255, 0.14);
+        color: var(--muted);
+        font-size: 0.8rem;
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .grafana-grid {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+      }
+
+      .grafana-panel {
+        border: 1px solid rgba(139, 176, 255, 0.12);
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(17, 28, 46, 0.95), rgba(8, 16, 30, 0.95));
+        padding: 14px;
+        min-height: 132px;
+      }
+
+      .grafana-panel.stat {
+        grid-column: span 3;
+      }
+
+      .grafana-panel.timeseries {
+        grid-column: span 8;
+        min-height: 252px;
+      }
+
+      .grafana-panel.side {
+        grid-column: span 4;
+      }
+
+      .grafana-panel.full {
+        grid-column: 1 / -1;
+      }
+
+      .panel-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .panel-head strong {
+        font-size: 0.95rem;
+        font-weight: 600;
+      }
+
+      .panel-head span {
+        color: var(--muted);
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .stat-value-lg {
+        font-size: 2rem;
+        font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+      }
+
+      .stat-meta {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .stat-trend {
+        margin-top: 16px;
+        height: 42px;
+        display: grid;
+        grid-template-columns: repeat(16, 1fr);
+        gap: 6px;
+        align-items: end;
+      }
+
+      .spark {
+        border-radius: 999px 999px 4px 4px;
+        background: linear-gradient(180deg, rgba(118, 214, 255, 0.95), rgba(118, 214, 255, 0.18));
+      }
+
+      .spark.green {
+        background: linear-gradient(180deg, rgba(156, 255, 176, 0.95), rgba(156, 255, 176, 0.18));
+      }
+
+      .graph-wrap {
+        position: relative;
+        height: 176px;
+        margin-top: 8px;
+        border-radius: 12px;
+        overflow: hidden;
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+        background-size: 100% 25%, 12.5% 100%, 100% 100%;
+      }
+
+      .line {
+        position: absolute;
+        left: 4%;
+        right: 4%;
+        height: 100%;
+      }
+
+      .line svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .legend-swatch {
+        width: 12px;
+        height: 12px;
+        border-radius: 4px;
+      }
+
+      .inventory-bars {
+        display: grid;
+        gap: 12px;
+        margin-top: 10px;
+      }
+
+      .inventory-row {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr auto;
+        gap: 12px;
+        align-items: center;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .inventory-track {
+        height: 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        overflow: hidden;
+      }
+
+      .inventory-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, rgba(156, 255, 176, 0.95), rgba(118, 214, 255, 0.8));
+      }
+
+      .inventory-fill.warn {
+        background: linear-gradient(90deg, rgba(255, 210, 111, 0.98), rgba(255, 127, 150, 0.85));
+      }
+
+      .query-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .query-pill {
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(139, 176, 255, 0.14);
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .alert-table {
+        width: 100%;
+        border-collapse: collapse;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      .alert-table th,
+      .alert-table td {
+        text-align: left;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(139, 176, 255, 0.1);
+      }
+
+      .badge-ok,
+      .badge-warn,
+      .badge-firing {
+        display: inline-flex;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 0.74rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .badge-ok {
+        color: #082312;
+        background: rgba(156, 255, 176, 0.92);
+      }
+
+      .badge-warn {
+        color: #3a2400;
+        background: rgba(255, 210, 111, 0.95);
+      }
+
+      .badge-firing {
+        color: #360410;
+        background: rgba(255, 127, 150, 0.94);
+      }
+
+      .chart {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        align-items: end;
+        gap: 10px;
+        height: 180px;
+        margin-top: 18px;
+      }
+
+      .bar {
+        border-radius: 14px 14px 6px 6px;
+        background: linear-gradient(180deg, rgba(118, 214, 255, 0.9), rgba(118, 214, 255, 0.18));
+      }
+
+      .bar:nth-child(2n) {
+        background: linear-gradient(180deg, rgba(156, 255, 176, 0.9), rgba(156, 255, 176, 0.18));
+      }
+
+      .metric-stack {
+        display: grid;
+        gap: 12px;
+      }
+
+      .metric-row {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 14px;
+        align-items: center;
+      }
+
+      .metric-row span {
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .meter {
+        height: 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        overflow: hidden;
+      }
+
+      .meter-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      }
+
+      .terminal {
+        padding: 18px;
+        border-radius: 18px;
+        background: #06101c;
+        border: 1px solid rgba(118, 214, 255, 0.12);
+        color: #d8f5ff;
+      }
+
+      .terminal code {
+        display: block;
+        white-space: pre-wrap;
+        line-height: 1.75;
+      }
+
+      .walkthrough-grid {
+        grid-template-columns: 1.1fr 0.9fr;
+      }
+
+      .step-list {
+        display: grid;
+        gap: 14px;
+      }
+
+      .step-card {
+        padding: 18px;
+      }
+
+      .step-card h3 {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        font-size: 1rem;
+      }
+
+      .step-number {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+        background: rgba(118, 214, 255, 0.1);
+        color: var(--accent);
+        font-family: "IBM Plex Mono", monospace;
+      }
+
+      .step-card p {
+        margin: 12px 0 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .readme-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .footer-note {
+        margin-top: 16px;
+        color: var(--muted);
+        font-size: 0.92rem;
+        line-height: 1.7;
+      }
+
+      @media (max-width: 980px) {
+        .hero-grid,
+        .walkthrough-grid,
+        .preview-grid,
+        .readme-grid,
+        .surface-grid,
+        .architecture {
+          grid-template-columns: 1fr;
+        }
+
+        .grafana-panel.stat,
+        .grafana-panel.timeseries,
+        .grafana-panel.side,
+        .grafana-panel.full {
+          grid-column: 1 / -1;
+        }
+
+        .panel::after {
+          display: none;
+        }
+
+        .hero {
+          padding: 28px;
+        }
+
+        .section {
+          padding: 22px;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .topbar {
+          border-radius: 22px;
+          align-items: start;
+          flex-direction: column;
+        }
+
+        h1 {
+          font-size: 2.4rem;
+        }
+
+        .page {
+          width: min(100% - 20px, 1180px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark"></span>
+          <span>ecommerce-sre-lab / local demo</span>
+        </div>
+        <nav class="nav">
+          <a href="#surfaces">Entry Points</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#preview">Preview</a>
+          <a href="#walkthrough">Walkthrough</a>
+          <a href="#readme">README Guide</a>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <div class="hero-grid">
+          <div>
+            <span class="eyebrow">Static Preview for a Local-First SRE System</span>
+            <h1>Review the system before you deploy anything.</h1>
+            <p>
+              This page is a static walkthrough for <strong>ecommerce-sre-lab</strong>.
+              It does not pretend to be live data. Instead, it gives you a fast visual
+              read of the Grafana dashboard, Prometheus surface, exporter endpoints,
+              and the recommended path for local demo review.
+            </p>
+            <div class="hero-actions">
+              <a class="button primary" href="http://localhost:3000/d/ecommerce-overview">Open Dashboard</a>
+              <a class="button secondary" href="../README.md">Open English README</a>
+              <a class="button secondary" href="../README.zh-CN.md">Open Chinese README</a>
+            </div>
+          </div>
+          <div class="status-column">
+            <div class="status-card">
+              <div class="status-label">Current project state</div>
+              <div class="status-value ok">CI passing</div>
+            </div>
+            <div class="status-card">
+              <div class="status-label">Demo mode</div>
+              <div class="status-value warn">Local only, no cloud required</div>
+            </div>
+            <div class="status-card">
+              <div class="status-label">Review strategy</div>
+              <div class="mini-links">
+                <span class="url-pill">1. Read this page</span>
+                <span class="url-pill">2. Run docker compose</span>
+                <span class="url-pill">3. Open localhost endpoints</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="surfaces">
+        <div class="section-head">
+          <div>
+            <span class="section-eyebrow">Entry Points</span>
+            <h2>What to open when the stack is running locally</h2>
+            <p>These are the real URLs exposed by the stack. The static page helps you understand them before you start the services.</p>
+          </div>
+        </div>
+        <div class="surface-grid">
+          <article class="surface-card">
+            <h3>Grafana Dashboard</h3>
+            <p>Primary review surface for the system. This is the best main demo entry.</p>
+            <div class="url-pill">http://localhost:3000/d/ecommerce-overview</div>
+          </article>
+          <article class="surface-card">
+            <h3>Grafana Admin</h3>
+            <p>Management entry for dashboards and configuration checks. Credentials remain local.</p>
+            <div class="url-pill">admin / ecommerce-admin</div>
+          </article>
+          <article class="surface-card">
+            <h3>Prometheus</h3>
+            <p>Use this to validate scrape status, targets, and alert rule evaluation during local drills.</p>
+            <div class="url-pill">http://localhost:9090</div>
+          </article>
+          <article class="surface-card">
+            <h3>Metrics</h3>
+            <p>Exporter metrics surface for verifying the Prometheus contract and metric family names.</p>
+            <div class="url-pill">http://localhost:8000/metrics</div>
+          </article>
+          <article class="surface-card">
+            <h3>State Snapshot</h3>
+            <p>Quick inspection surface for current in-memory order, inventory, and fulfillment state.</p>
+            <div class="url-pill">http://localhost:8000/state</div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="architecture">
+        <div class="section-head">
+          <div>
+            <span class="section-eyebrow">Architecture</span>
+            <h2>How the local demo moves through the system</h2>
+            <p>The core path is intentionally small: simulators feed exporter metrics, Prometheus scrapes and evaluates rules, and Grafana renders the operations view.</p>
+          </div>
+        </div>
+        <div class="architecture">
+          <article class="panel">
+            <h3>Python Exporter</h3>
+            <p>Hosts `/metrics`, `/state`, `/healthz`, and chaos endpoints for stockout, traffic spike, outage, and restock drills.</p>
+          </article>
+          <article class="panel">
+            <h3>Prometheus</h3>
+            <p>Scrapes exporter metrics, loads alert rules, and acts as the metrics source of truth for the lab.</p>
+          </article>
+          <article class="panel">
+            <h3>Grafana</h3>
+            <p>Loads the provisioned dashboard and gives you the best “single-screen demo” for the project.</p>
+          </article>
+          <article class="panel">
+            <h3>Runbooks</h3>
+            <p>Turn the dashboard and alerts into operations workflow by documenting diagnosis and remediation steps.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="preview">
+        <div class="section-head">
+          <div>
+            <span class="section-eyebrow">Static Preview</span>
+            <h2>Screenshot-style panels for fast visual review</h2>
+            <p>These are intentionally static mock surfaces based on the real dashboard layout and endpoint structure. They are not presented as live screenshots.</p>
+          </div>
+        </div>
+        <div class="preview-grid">
+          <article class="window">
+            <div class="window-top">
+              <div class="dots"><span></span><span></span><span></span></div>
+              <div class="window-title">Grafana / E-commerce Supply Chain Overview</div>
+            </div>
+            <div class="window-body tight dashboard-shell">
+              <div class="dashboard-toolbar">
+                <div class="toolbar-title">
+                  <strong>E-commerce Supply Chain Overview</strong>
+                  <span>Last 15 minutes · auto refresh 10s</span>
+                </div>
+                <div class="toolbar-actions">
+                  <span class="toolbar-pill">Filters: env=lab</span>
+                  <span class="toolbar-pill">Refresh</span>
+                  <span class="toolbar-pill">Share</span>
+                </div>
+              </div>
+              <div class="grafana-grid">
+                <section class="grafana-panel stat">
+                  <div class="panel-head">
+                    <strong>Orders / min</strong>
+                    <span>Stat</span>
+                  </div>
+                  <div class="stat-value-lg">126</div>
+                  <div class="stat-meta">+12.4% vs previous window</div>
+                  <div class="stat-trend">
+                    <span class="spark" style="height: 38%"></span>
+                    <span class="spark" style="height: 52%"></span>
+                    <span class="spark" style="height: 45%"></span>
+                    <span class="spark" style="height: 61%"></span>
+                    <span class="spark" style="height: 58%"></span>
+                    <span class="spark" style="height: 70%"></span>
+                    <span class="spark" style="height: 68%"></span>
+                    <span class="spark" style="height: 75%"></span>
+                    <span class="spark" style="height: 82%"></span>
+                    <span class="spark" style="height: 88%"></span>
+                    <span class="spark" style="height: 76%"></span>
+                    <span class="spark" style="height: 79%"></span>
+                    <span class="spark" style="height: 74%"></span>
+                    <span class="spark" style="height: 86%"></span>
+                    <span class="spark" style="height: 80%"></span>
+                    <span class="spark" style="height: 92%"></span>
+                  </div>
+                </section>
+                <section class="grafana-panel stat">
+                  <div class="panel-head">
+                    <strong>P95 Latency</strong>
+                    <span>Stat</span>
+                  </div>
+                  <div class="stat-value-lg">24.8s</div>
+                  <div class="stat-meta">SLO threshold at 30s</div>
+                  <div class="stat-trend">
+                    <span class="spark green" style="height: 56%"></span>
+                    <span class="spark green" style="height: 48%"></span>
+                    <span class="spark green" style="height: 44%"></span>
+                    <span class="spark green" style="height: 53%"></span>
+                    <span class="spark green" style="height: 59%"></span>
+                    <span class="spark green" style="height: 62%"></span>
+                    <span class="spark green" style="height: 58%"></span>
+                    <span class="spark green" style="height: 66%"></span>
+                    <span class="spark green" style="height: 61%"></span>
+                    <span class="spark green" style="height: 57%"></span>
+                    <span class="spark green" style="height: 52%"></span>
+                    <span class="spark green" style="height: 49%"></span>
+                    <span class="spark green" style="height: 46%"></span>
+                    <span class="spark green" style="height: 43%"></span>
+                    <span class="spark green" style="height: 39%"></span>
+                    <span class="spark green" style="height: 41%"></span>
+                  </div>
+                </section>
+                <section class="grafana-panel stat">
+                  <div class="panel-head">
+                    <strong>Fulfillment Success</strong>
+                    <span>Stat</span>
+                  </div>
+                  <div class="stat-value-lg">99.1%</div>
+                  <div class="stat-meta">Failure ratio stays below alert threshold</div>
+                  <div class="stat-trend">
+                    <span class="spark green" style="height: 90%"></span>
+                    <span class="spark green" style="height: 84%"></span>
+                    <span class="spark green" style="height: 91%"></span>
+                    <span class="spark green" style="height: 88%"></span>
+                    <span class="spark green" style="height: 92%"></span>
+                    <span class="spark green" style="height: 86%"></span>
+                    <span class="spark green" style="height: 89%"></span>
+                    <span class="spark green" style="height: 93%"></span>
+                    <span class="spark green" style="height: 88%"></span>
+                    <span class="spark green" style="height: 90%"></span>
+                    <span class="spark green" style="height: 94%"></span>
+                    <span class="spark green" style="height: 91%"></span>
+                    <span class="spark green" style="height: 89%"></span>
+                    <span class="spark green" style="height: 90%"></span>
+                    <span class="spark green" style="height: 92%"></span>
+                    <span class="spark green" style="height: 95%"></span>
+                  </div>
+                </section>
+                <section class="grafana-panel stat">
+                  <div class="panel-head">
+                    <strong>Stockout Events</strong>
+                    <span>Stat</span>
+                  </div>
+                  <div class="stat-value-lg">3</div>
+                  <div class="stat-meta">Last drill cleared via restock</div>
+                  <div class="stat-trend">
+                    <span class="spark" style="height: 14%"></span>
+                    <span class="spark" style="height: 18%"></span>
+                    <span class="spark" style="height: 16%"></span>
+                    <span class="spark" style="height: 42%"></span>
+                    <span class="spark" style="height: 20%"></span>
+                    <span class="spark" style="height: 16%"></span>
+                    <span class="spark" style="height: 14%"></span>
+                    <span class="spark" style="height: 12%"></span>
+                    <span class="spark" style="height: 12%"></span>
+                    <span class="spark" style="height: 16%"></span>
+                    <span class="spark" style="height: 20%"></span>
+                    <span class="spark" style="height: 22%"></span>
+                    <span class="spark" style="height: 18%"></span>
+                    <span class="spark" style="height: 17%"></span>
+                    <span class="spark" style="height: 12%"></span>
+                    <span class="spark" style="height: 10%"></span>
+                  </div>
+                </section>
+                <section class="grafana-panel timeseries">
+                  <div class="panel-head">
+                    <strong>Order Processing Latency</strong>
+                    <span>Time series</span>
+                  </div>
+                  <div class="graph-wrap">
+                    <div class="line">
+                      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                        <polyline
+                          fill="none"
+                          stroke="rgba(118,214,255,0.95)"
+                          stroke-width="2.2"
+                          points="0,72 7,68 14,62 21,57 28,61 35,48 42,52 49,44 56,40 63,35 70,39 77,28 84,31 91,24 100,18"
+                        />
+                        <polyline
+                          fill="none"
+                          stroke="rgba(156,255,176,0.9)"
+                          stroke-width="2"
+                          points="0,84 7,80 14,78 21,75 28,74 35,70 42,66 49,62 56,60 63,56 70,54 77,50 84,46 91,45 100,40"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="legend">
+                    <span class="legend-item"><span class="legend-swatch" style="background: rgba(118,214,255,0.95)"></span>P95 latency</span>
+                    <span class="legend-item"><span class="legend-swatch" style="background: rgba(156,255,176,0.9)"></span>P50 latency</span>
+                  </div>
+                  <div class="query-strip">
+                    <span class="query-pill">histogram_quantile(0.95, ...)</span>
+                    <span class="query-pill">histogram_quantile(0.50, ...)</span>
+                  </div>
+                </section>
+                <section class="grafana-panel side">
+                  <div class="panel-head">
+                    <strong>Inventory Level by SKU</strong>
+                    <span>Bar gauge</span>
+                  </div>
+                  <div class="inventory-bars">
+                    <div class="inventory-row">
+                      <span>sku-red-shirt</span>
+                      <div class="inventory-track"><div class="inventory-fill" style="width: 72%"></div></div>
+                      <strong>43</strong>
+                    </div>
+                    <div class="inventory-row">
+                      <span>sku-blue-hoodie</span>
+                      <div class="inventory-track"><div class="inventory-fill" style="width: 54%"></div></div>
+                      <strong>31</strong>
+                    </div>
+                    <div class="inventory-row">
+                      <span>sku-green-cap</span>
+                      <div class="inventory-track"><div class="inventory-fill warn" style="width: 18%"></div></div>
+                      <strong>9</strong>
+                    </div>
+                    <div class="inventory-row">
+                      <span>sku-black-socks</span>
+                      <div class="inventory-track"><div class="inventory-fill" style="width: 68%"></div></div>
+                      <strong>39</strong>
+                    </div>
+                  </div>
+                </section>
+                <section class="grafana-panel full">
+                  <div class="panel-head">
+                    <strong>Alert State</strong>
+                    <span>Table</span>
+                  </div>
+                  <table class="alert-table">
+                    <thead>
+                      <tr>
+                        <th>Rule</th>
+                        <th>Status</th>
+                        <th>Signal</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>HighOrderLatency</td>
+                        <td><span class="badge-ok">Normal</span></td>
+                        <td>P95 24.8s</td>
+                        <td>Observe dashboard trend</td>
+                      </tr>
+                      <tr>
+                        <td>LowInventoryWarning</td>
+                        <td><span class="badge-warn">Pending</span></td>
+                        <td>sku-green-cap at 9</td>
+                        <td>Prepare restock drill</td>
+                      </tr>
+                      <tr>
+                        <td>FulfillmentOutage</td>
+                        <td><span class="badge-ok">Normal</span></td>
+                        <td>Failure ratio 0.9%</td>
+                        <td>Review runbook only if spike occurs</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </section>
+              </div>
+            </div>
+          </article>
+
+          <article class="window">
+            <div class="window-top">
+              <div class="dots"><span></span><span></span><span></span></div>
+              <div class="window-title">Prometheus / Target Health</div>
+            </div>
+            <div class="window-body">
+              <div class="metric-stack">
+                <div class="metric-row">
+                  <span>ecommerce-exporter / up</span>
+                  <div class="meter"><div class="meter-fill" style="width: 100%"></div></div>
+                </div>
+                <div class="metric-row">
+                  <span>high_order_latency alert</span>
+                  <div class="meter"><div class="meter-fill" style="width: 38%"></div></div>
+                </div>
+                <div class="metric-row">
+                  <span>low_inventory_warning alert</span>
+                  <div class="meter"><div class="meter-fill" style="width: 24%"></div></div>
+                </div>
+                <div class="metric-row">
+                  <span>fulfillment_outage alert</span>
+                  <div class="meter"><div class="meter-fill" style="width: 16%"></div></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="window">
+            <div class="window-top">
+              <div class="dots"><span></span><span></span><span></span></div>
+              <div class="window-title">Exporter / Metrics Contract</div>
+            </div>
+            <div class="window-body">
+              <div class="terminal">
+                <code># HELP ecommerce_orders_total Total simulated e-commerce orders by status.
+# TYPE ecommerce_orders_total counter
+ecommerce_orders_total{status="completed"} 184
+ecommerce_orders_total{status="failed"} 7
+ecommerce_inventory_level{sku="sku-red-shirt"} 43
+ecommerce_fulfillment_failed_total 2</code>
+              </div>
+            </div>
+          </article>
+
+          <article class="window">
+            <div class="window-top">
+              <div class="dots"><span></span><span></span><span></span></div>
+              <div class="window-title">State / Chaos Drill Flow</div>
+            </div>
+            <div class="window-body">
+              <div class="terminal">
+                <code>POST /chaos/simulate_stockout
+POST /chaos/restock
+
+inventory:
+  sku-red-shirt: 43
+orders:
+  pending: 5
+  processing: 3
+fulfillment:
+  outage: false</code>
+              </div>
+            </div>
+          </article>
+        </div>
+        <p class="footer-note">
+          Static preview note: these panels are mockups designed to help you decide whether the local stack looks coherent before you run Docker.
+        </p>
+      </section>
+
+      <section class="section" id="walkthrough">
+        <div class="section-head">
+          <div>
+            <span class="section-eyebrow">Walkthrough</span>
+            <h2>How to review the demo locally in the right order</h2>
+            <p>If you want to assess the project quickly, follow the sequence below. It keeps the review practical and close to actual SRE usage.</p>
+          </div>
+        </div>
+        <div class="walkthrough-grid">
+          <div class="step-list">
+            <article class="step-card">
+              <h3><span class="step-number">01</span> Start the stack</h3>
+              <p>Run Docker Compose from the repository root and wait for Grafana and Prometheus to come up.</p>
+            </article>
+            <article class="step-card">
+              <h3><span class="step-number">02</span> Open the dashboard first</h3>
+              <p>Use the Grafana dashboard as the main visual review surface. It gives the fastest signal that the system is healthy.</p>
+            </article>
+            <article class="step-card">
+              <h3><span class="step-number">03</span> Verify metrics and state</h3>
+              <p>Check `/metrics` for naming and structure, then `/state` for current simulator state.</p>
+            </article>
+            <article class="step-card">
+              <h3><span class="step-number">04</span> Run a chaos drill</h3>
+              <p>Trigger stockout, traffic spike, or outage and watch how the dashboard and alerts respond.</p>
+            </article>
+          </div>
+          <div class="terminal">
+            <code>$ docker compose up --build
+
+$ open http://localhost:3000/d/ecommerce-overview
+$ open http://localhost:9090
+$ open http://localhost:8000/metrics
+$ open http://localhost:8000/state
+
+$ curl -X POST http://localhost:8000/chaos/simulate_stockout \
+  -H "Content-Type: application/json" \
+  -d '{"sku_id":"sku-red-shirt"}'</code>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="readme">
+        <div class="section-head">
+          <div>
+            <span class="section-eyebrow">README Upgrade</span>
+            <h2>What the repository documentation should now communicate</h2>
+            <p>The repository should make the path obvious: first open the static preview, then run the local system, then capture screenshots from the real stack.</p>
+          </div>
+        </div>
+        <div class="readme-grid">
+          <article class="step-card">
+            <h3>Static preview first</h3>
+            <p>Point users to `docs/index.html` or a local static preview URL so they can understand the system before running Docker.</p>
+          </article>
+          <article class="step-card">
+            <h3>Screenshot checklist</h3>
+            <p>Ask for four repository screenshots after local startup: dashboard overview, Prometheus targets, metrics endpoint, and state snapshot.</p>
+          </article>
+          <article class="step-card">
+            <h3>Clear local entry points</h3>
+            <p>Keep all localhost URLs together in one section so the project feels immediately runnable and easy to review.</p>
+          </article>
+          <article class="step-card">
+            <h3>Honest scope statement</h3>
+            <p>Make it clear what is static preview content and what is live runtime content, so the repo stays trustworthy.</p>
+          </article>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

@@ -5,6 +5,21 @@
 [![CI](https://github.com/Cassie-Tatibana/ecommerce-sre-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/Cassie-Tatibana/ecommerce-sre-lab/actions/workflows/ci.yml)
 [English README](README.md)
 
+## Demo 预览
+
+- 静态 demo 页：[`docs/index.html`](docs/index.html)
+- 不启动 Docker 也可以先本地预览：
+
+```bash
+python3 -m http.server 4173 -d docs
+```
+
+然后打开 [http://127.0.0.1:4173](http://127.0.0.1:4173)。
+
+- 静态 demo 页用于先看布局、架构和演示路径。
+- 下面的 localhost 服务地址用于查看真实运行中的系统。
+- 静态 demo 页里的面板是静态 mock 预览，不是实时数据截图；真实效果以本地运行后的 Grafana、Prometheus 和 exporter 为准。
+
 ## 项目价值
 
 - 提供一个可直接运行的可靠性实验环境，覆盖订单、库存、履约三个核心链路。
@@ -50,6 +65,24 @@ docker compose up --build
 - Grafana 管理入口：`http://localhost:3000`（`admin` / `ecommerce-admin`）
 - Dashboard：`http://localhost:3000/d/ecommerce-overview`（已开启匿名只读访问）
 - 状态快照：`http://localhost:8000/state`
+
+## 截图版 Demo 清单
+
+本地启动后，建议至少截图这 4 个画面：
+
+| 截图项 | 建议内容 |
+| --- | --- |
+| Dashboard 总览 | Grafana 的 `/d/ecommerce-overview` 页面 |
+| Prometheus 页面 | targets 或 rules 等能体现采集与告警状态的页面 |
+| Metrics 页面 | `/metrics` 中的 `ecommerce_*` 指标族 |
+| State 页面 | `/state` 返回的订单、库存、履约状态 |
+
+建议查看顺序：
+
+1. 先打开 `docs/index.html` 看静态 demo 页。
+2. 再执行 `docker compose up --build`。
+3. 先看 Grafana dashboard，再看 Prometheus、`/metrics`、`/state`。
+4. 如需补充演示，再触发一次 chaos drill 并截图前后变化。
 
 ## Chaos 接口
 

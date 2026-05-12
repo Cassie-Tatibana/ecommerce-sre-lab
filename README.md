@@ -5,6 +5,21 @@ A self-contained SRE observability system for a simulated e-commerce supply chai
 [![CI](https://github.com/Cassie-Tatibana/ecommerce-sre-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/Cassie-Tatibana/ecommerce-sre-lab/actions/workflows/ci.yml)
 [\u4e2d\u6587 README](README.zh-CN.md)
 
+## Demo Preview
+
+- Static demo page: [`docs/index.html`](docs/index.html)
+- Preview it locally without Docker:
+
+```bash
+python3 -m http.server 4173 -d docs
+```
+
+Then open [http://127.0.0.1:4173](http://127.0.0.1:4173).
+
+- Use the static page to review layout, architecture, and demo flow before running the stack.
+- Use the localhost services below to review the real runtime once Docker is running.
+- The static demo page contains mock preview panels. The localhost endpoints expose the actual system.
+
 ## Why This Project
 
 - Provides a runnable reliability playground for order flow, inventory health, and fulfillment operations.
@@ -49,6 +64,24 @@ Services:
 - Grafana admin: [http://localhost:3000](http://localhost:3000) (`admin` / `ecommerce-admin`)
 - Dashboard: [http://localhost:3000/d/ecommerce-overview](http://localhost:3000/d/ecommerce-overview) (anonymous viewer access enabled)
 - State snapshot: [http://localhost:8000/state](http://localhost:8000/state)
+
+## Screenshot Demo Checklist
+
+Capture these after the local stack is up:
+
+| Screenshot | What it should show |
+| --- | --- |
+| Dashboard overview | Grafana dashboard at `/d/ecommerce-overview` |
+| Prometheus targets or rules | Successful scraping and alert evaluation surfaces |
+| Metrics endpoint | `ecommerce_*` metric families from `/metrics` |
+| State snapshot | Current order, inventory, and fulfillment state from `/state` |
+
+Suggested review order:
+
+1. Open the static demo page in `docs/index.html`.
+2. Run `docker compose up --build`.
+3. Open Grafana dashboard first, then Prometheus, then `/metrics`, then `/state`.
+4. Trigger a chaos drill and capture before/after screenshots if needed.
 
 Chaos endpoints:
 
