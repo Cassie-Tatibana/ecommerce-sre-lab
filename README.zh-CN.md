@@ -3,7 +3,7 @@
 一个面向电商供应链场景的自包含 SRE 可观测性系统。它把指标采集、看板、告警、Runbook、故障演练、CI 和 smoke tests 组合成一个可运行的平台，用于可靠性演练与系统运维实践。
 
 [![CI](https://github.com/Cassie-Tatibana/ecommerce-sre-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/Cassie-Tatibana/ecommerce-sre-lab/actions/workflows/ci.yml)
-[![English README](README.md)](README.md)
+[English README](README.md)
 
 ## 项目价值
 
@@ -47,7 +47,8 @@ docker compose up --build
 
 - Exporter 指标：`http://localhost:8000/metrics`
 - Prometheus：`http://localhost:9090`
-- Grafana：`http://localhost:3000`
+- Grafana：`http://localhost:3000`（`admin` / `ecommerce-admin`）
+- Dashboard：`http://localhost:3000/d/ecommerce-overview`
 - 状态快照：`http://localhost:8000/state`
 
 ## Chaos 接口

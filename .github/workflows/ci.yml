@@ -32,6 +32,10 @@ jobs:
   smoke-tests:
     runs-on: ubuntu-latest
     needs: test-and-build
+    env:
+      GRAFANA_URL: http://127.0.0.1:3000
+      GRAFANA_USERNAME: admin
+      GRAFANA_PASSWORD: ecommerce-admin
 
     steps:
       - name: Checkout
@@ -53,12 +57,14 @@ jobs:
       - name: Wait for Grafana
         run: |
           for i in $(seq 1 30); do
-            if curl -fsS http://127.0.0.1:3000/api/health >/dev/null; then
+            if curl -fsS "$GRAFANA_URL/api/health" >/dev/null \
+              && curl -fsS -u "$GRAFANA_USERNAME:$GRAFANA_PASSWORD" \
+                "$GRAFANA_URL/api/dashboards/uid/ecommerce-overview" >/dev/null; then
               exit 0
             fi
             sleep 5
           done
-          echo "Grafana did not become healthy in time"
+          echo "Grafana dashboard did not become ready in time"
           exit 1
 
       - name: Run Playwright smoke tests

@@ -46,7 +46,8 @@ docker compose up --build
 Services:
 - Exporter: [http://localhost:8000/metrics](http://localhost:8000/metrics)
 - Prometheus: [http://localhost:9090](http://localhost:9090)
-- Grafana: [http://localhost:3000](http://localhost:3000) (`admin` / `admin`)
+- Grafana: [http://localhost:3000](http://localhost:3000) (`admin` / `ecommerce-admin`)
+- Dashboard: [http://localhost:3000/d/ecommerce-overview](http://localhost:3000/d/ecommerce-overview)
 - State snapshot: [http://localhost:8000/state](http://localhost:8000/state)
 
 Chaos endpoints:
